@@ -1,0 +1,47 @@
+name: Build iOS IPA
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      - name: Archive (unsigned)
+        run: |
+          xcodebuild -project ShapeMahjong.xcodeproj \
+            -scheme ShapeMahjong \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath build/ShapeMahjong.xcarchive \
+            archive \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGN_IDENTITY=""
+
+      - name: Package unsigned IPA
+        run: |
+          mkdir -p Payload
+          cp -r build/ShapeMahjong.xcarchive/Products/Applications/ShapeMahjong.app Payload/
+          zip -r ShapeMahjong-unsigned.ipa Payload
+          ls -lh ShapeMahjong-unsigned.ipa
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: ShapeMahjong-unsigned
+          path: ShapeMahjong-unsigned.ipa
+          if-no-files-found: error
