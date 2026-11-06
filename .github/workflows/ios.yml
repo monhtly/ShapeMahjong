@@ -35,7 +35,7 @@ jobs:
       - name: Package unsigned IPA
         run: |
           mkdir -p Payload
-          cp -r build/ShapeMahjong.xcarchive/Products/Applications/ShapeMahjong.app Payload/
+          cp -r "build/ShapeMahjong.xcarchive/Products/Applications/Shape Tiles.app" Payload/
           zip -r ShapeMahjong-unsigned.ipa Payload
           ls -lh ShapeMahjong-unsigned.ipa
 
