@@ -189,9 +189,9 @@ struct SeededRNG: RandomNumberGenerator {
 enum DailySeed {
     static func seed(for date: Date = Date()) -> UInt64 {
         let cal = Calendar.current
-        let comps = cal.dateComponents([.year, .dayOfYear], from: date)
-        let year = UInt64(comps.year ?? 2026)
-        let day = UInt64(comps.dayOfYear ?? 1)
+        let year = UInt64(cal.component(.year, from: date))
+        // ordinality(of:in:for:) is available on iOS 17; .dayOfYear needs iOS 18.
+        let day = UInt64(cal.ordinality(of: .day, in: .year, for: date) ?? 1)
         return year * 1000 + day
     }
 
